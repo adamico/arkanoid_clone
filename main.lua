@@ -19,9 +19,13 @@ bricks.top_left_position = {x = 70, y = 50}
 bricks.gap = {width = 10, height = 10}
 bricks.current_level_bricks = {}
 
+local walls = {thickness = 20}
+walls.current_level_walls = {}
+
 function love.load()
     love.window.setTitle('My Arkanoid Clone')
     bricks.construct_level()
+    walls.construct()
 end
 
 function bricks.construct_level()
@@ -48,6 +52,27 @@ function bricks.add_brick(position)
     table.insert(bricks.current_level_bricks, brick)
 end
 
+function walls.construct()
+    local screen_width = love.graphics.getWidth()
+    local screen_height = love.graphics.getHeight()
+    local top_left_corner = {x = 0, y = 0}
+    local top_right_corner = {x = screen_width - walls.thickness, y = 0}
+    local bottom_left_corner = {x = 0, y = screen_height - walls.thickness}
+
+    local top_wall = walls.add_wall("top", top_left_corner, screen_width, walls.thickness)
+    local left_wall = walls.add_wall("left", top_left_corner, walls.thickness, screen_height)
+    local right_wall = walls.add_wall("right", top_right_corner, walls.thickness, screen_height)
+    local bottom_wall = walls.add_wall("bottom", bottom_left_corner, screen_width, walls.thickness)
+end
+
+function walls.add_wall(direction, position, width, height)
+    local wall = {}
+    wall.position = position
+    wall.width = width
+    wall.height = height
+    walls.current_level_walls[direction] = wall
+end
+
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
@@ -58,12 +83,14 @@ function love.update(dt)
     ball.update(dt)
     player.update(dt)
     bricks.update(dt)
+    walls.update(dt)
 end
 
 function love.draw()
     ball.draw()
     player.draw()
     bricks.draw()
+    walls.draw()
 end
 
 function ball.update(dt)
@@ -98,12 +125,34 @@ function player.draw()
 end
 
 function bricks.draw()
-    for _, brick in ipairs(bricks.current_level_bricks) do
+    for _, brick in pairs(bricks.current_level_bricks) do
         Draw_object_rectangle(brick)
     end
 end
 
 function bricks.update(dt)
+    for _, brick in pairs(bricks.current_level_bricks) do
+        bricks.update_brick(dt, brick)
+    end
+end
+
+function bricks.update_brick(dt, brick)
+    
+end
+
+function walls.draw()
+    for direction, wall in pairs(walls.current_level_walls) do
+        if direction ~= "bottom" then Draw_object_rectangle(wall) end
+    end
+end
+
+function walls.update(dt)
+    for direction, wall in pairs(walls.current_level_walls) do
+        walls.update_wall(dt, wall)
+    end
+end
+
+function walls.update_wall(dt, wall)
 end
 
 function Draw_object_rectangle(object)
