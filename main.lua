@@ -1,32 +1,10 @@
-
-love.graphics.setDefaultFilter('nearest', 'nearest')
-
-local ball = {}
-ball.position = {x = 300, y = 300}
-ball.speed = {x = 300, y = 300}
-ball.radius = 10
-ball.segments = 16
-
-local player = {}
-player.position = {x = 500, y = 500}
-player.speed = {x = 300, y = 0}
-player.width, player.height = 70, 20
-
+-- bricks
 local bricks = {}
 bricks.width, bricks.height = 50, 30
 bricks.rows, bricks.columns = 8, 11
 bricks.top_left_position = {x = 70, y = 50}
 bricks.gap = {width = 10, height = 10}
 bricks.current_level_bricks = {}
-
-local walls = {thickness = 20}
-walls.current_level_walls = {}
-
-function love.load()
-    love.window.setTitle('My Arkanoid Clone')
-    bricks.construct_level()
-    walls.construct()
-end
 
 function bricks.construct_level()
     for row = 1, bricks.rows do
@@ -52,6 +30,27 @@ function bricks.add_brick(position)
     table.insert(bricks.current_level_bricks, brick)
 end
 
+
+function bricks.draw()
+    for _, brick in pairs(bricks.current_level_bricks) do
+        Draw_object_rectangle(brick)
+    end
+end
+
+function bricks.update(dt)
+    for _, brick in pairs(bricks.current_level_bricks) do
+        bricks.update_brick(dt, brick)
+    end
+end
+
+function bricks.update_brick(dt, brick)
+    
+end
+
+-- walls
+local walls = {thickness = 20}
+walls.current_level_walls = {}
+
 function walls.construct()
     local screen_width = love.graphics.getWidth()
     local screen_height = love.graphics.getHeight()
@@ -73,25 +72,27 @@ function walls.add_wall(direction, position, width, height)
     walls.current_level_walls[direction] = wall
 end
 
-function love.keypressed(key)
-    if key == 'escape' then
-        love.event.quit()
+function walls.draw()
+    for direction, wall in pairs(walls.current_level_walls) do
+        if direction ~= "bottom" then Draw_object_rectangle(wall) end
     end
 end
 
-function love.update(dt)
-    ball.update(dt)
-    player.update(dt)
-    bricks.update(dt)
-    walls.update(dt)
+function walls.update(dt)
+    for direction, wall in pairs(walls.current_level_walls) do
+        walls.update_wall(dt, wall)
+    end
 end
 
-function love.draw()
-    ball.draw()
-    player.draw()
-    bricks.draw()
-    walls.draw()
+function walls.update_wall(dt, wall)
 end
+
+-- ball
+local ball = {}
+ball.position = {x = 300, y = 300}
+ball.speed = {x = 300, y = 300}
+ball.radius = 10
+ball.segments = 16
 
 function ball.update(dt)
     ball.move(dt)
@@ -106,6 +107,12 @@ end
 function ball.draw()
     love.graphics.circle("line", ball.position.y, ball.position.y, ball.radius, ball.segments)
 end
+
+-- player
+local player = {}
+player.position = {x = 500, y = 500}
+player.speed = {x = 300, y = 0}
+player.width, player.height = 70, 20
 
 function player.update(dt)
     player.move(dt)
@@ -124,36 +131,36 @@ function player.draw()
     Draw_object_rectangle(player)
 end
 
-function bricks.draw()
-    for _, brick in pairs(bricks.current_level_bricks) do
-        Draw_object_rectangle(brick)
+-- main loop
+love.graphics.setDefaultFilter('nearest', 'nearest')
+
+function love.load()
+    love.window.setTitle('My Arkanoid Clone')
+    bricks.construct_level()
+    walls.construct()
+end
+
+function love.update(dt)
+    ball.update(dt)
+    player.update(dt)
+    bricks.update(dt)
+    walls.update(dt)
+end
+
+function love.keypressed(key)
+    if key == 'escape' then
+        love.event.quit()
     end
 end
 
-function bricks.update(dt)
-    for _, brick in pairs(bricks.current_level_bricks) do
-        bricks.update_brick(dt, brick)
-    end
+function love.draw()
+    ball.draw()
+    player.draw()
+    bricks.draw()
+    walls.draw()
 end
 
-function bricks.update_brick(dt, brick)
-    
-end
-
-function walls.draw()
-    for direction, wall in pairs(walls.current_level_walls) do
-        if direction ~= "bottom" then Draw_object_rectangle(wall) end
-    end
-end
-
-function walls.update(dt)
-    for direction, wall in pairs(walls.current_level_walls) do
-        walls.update_wall(dt, wall)
-    end
-end
-
-function walls.update_wall(dt, wall)
-end
+-- tools
 
 function Draw_object_rectangle(object)
     if object.position and object.width and object.height then
