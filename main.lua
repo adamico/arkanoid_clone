@@ -93,19 +93,32 @@ ball.position = {x = 300, y = 300}
 ball.speed = {x = 300, y = 300}
 ball.radius = 10
 ball.segments = 16
+ball.hitbox = {width = 2 * ball.radius, height = 2 * ball.radius}
+ball.hitbox.position = {}
 
 function ball.update(dt)
     ball.move(dt)
+
 end
 
 function ball.move(dt)
     --TODO: normalize diagonal movement
     ball.position.x = ball.position.x + ball.speed.x * dt
     ball.position.y = ball.position.y + ball.speed.y * dt
+    ball.update_hitbox(dt)
+end
+
+function ball.update_hitbox(dt)
+    ball.hitbox.position = ball.position + Vector(-ball.radius, -ball.radius)
 end
 
 function ball.draw()
     love.graphics.circle("line", ball.position.y, ball.position.y, ball.radius, ball.segments)
+    if debug == true then ball.draw_hitbox() end
+end
+
+function ball.draw_hitbox()
+    Draw_object_rectangle(ball.hitbox, {1, 0, 0})
 end
 
 -- player
@@ -113,6 +126,8 @@ local player = {}
 player.position = {x = 500, y = 500}
 player.speed = {x = 300, y = 0}
 player.width, player.height = 70, 20
+player.hitbox = {width = player.width - 2, height = player.height - 2}
+player.hitbox.position = {}
 
 function player.update(dt)
     player.move(dt)
@@ -125,19 +140,61 @@ function player.move(dt)
     if love.keyboard.isDown("left") then
         player.position.x = player.position.x - player.speed.x * dt
     end
+    player.update_hitbox(dt)
+end
+
+function player.update_hitbox(dt)
+    player.hitbox.position = player.position + Vector(1,1)
 end
 
 function player.draw()
     Draw_object_rectangle(player)
+    if debug == true then player.draw_hitbox() end
+end
+
+function player.draw_hitbox()
+    Draw_object_rectangle(player.hitbox, {1, 0, 0})
+end
+
+
+-- collisions
+local collisions = {}
+
+function collisions.resolve()
+    collisions.ball_player_collision(ball, player)
+    -- collisions.ball_walls_collision(ball, walls)
+    -- collisions.ball_bricks_collision(ball, bricks)
+    -- collisions.player_walls_collision(player, walls)
+end
+
+function collisions.rectangles_overlapping(a, b)
+    local overlap = false
+    local ax = a.position.x
+    local ay = a.position.y
+    local bx = b.position.x
+    local by = b.position.y
+    if not(ax + a.width < bx  or bx + b.width < ax or
+            ay + a.height < by or by + b.height < ay) then
+       overlap = true
+    end
+    return overlap
+end
+
+function collisions.ball_player_collision(ball, player)
+    if collisions.rectangles_overlapping(ball.hitbox, player.hitbox) then
+        print("ball-player collision")
+    end
 end
 
 -- main loop
 love.graphics.setDefaultFilter('nearest', 'nearest')
 
 function love.load()
+    Vector = require('lib.hump.vector')
     love.window.setTitle('My Arkanoid Clone')
     bricks.construct_level()
     walls.construct()
+    debug = true
 end
 
 function love.update(dt)
@@ -145,6 +202,8 @@ function love.update(dt)
     player.update(dt)
     bricks.update(dt)
     walls.update(dt)
+
+    collisions.resolve()
 end
 
 function love.keypressed(key)
@@ -162,8 +221,12 @@ end
 
 -- tools
 
-function Draw_object_rectangle(object)
+function Draw_object_rectangle(object, color)
+    local mycolor = color or {1, 1, 1}
     if object.position and object.width and object.height then
+        if mycolor then
+            love.graphics.setColor(mycolor)
+        end
         love.graphics.rectangle("line", object.position.x, object.position.y, object.width, object.height)
     end
 end
