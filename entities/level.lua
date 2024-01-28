@@ -30,6 +30,7 @@ function Level.static:constructBricks(level_pattern)
   local top_left_position = {x = 70, y = 70}
   local width, height = 50, 30
   local gap = 10
+  local color_codes = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
   Entities.bricks = {}
   for row_index, row in ipairs(level_pattern) do
     for col_index, brick_type in ipairs(row) do
@@ -39,7 +40,7 @@ function Level.static:constructBricks(level_pattern)
           x = top_left_position.x + width/2 + (col_index - 1) * (width + gap),
           y = top_left_position.y + height/2 + (row_index - 1) * (height + gap)
         }
-        local brick = Brick:new(brick_index, position, width, height)
+        local brick = Brick:new(brick_index, position, width, height, color_codes[brick_type])
         Entities.bricks[brick_index] = brick
       end
     end
