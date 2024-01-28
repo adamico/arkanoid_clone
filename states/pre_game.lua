@@ -1,5 +1,4 @@
 local pre_game = {}
-local game = require 'states.game'
 
 local Ball = require 'entities.ball'
 local Player = require 'entities.player'
@@ -27,7 +26,7 @@ end
 
 function pre_game:mousereleased(x, y, button, istouch, presses)
   if button == 1 then
-    Gamestate.switch(game)
+    Gamestate.switch(Game, 1)
   end
 end
 

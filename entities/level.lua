@@ -5,9 +5,9 @@ local Brick = require 'entities.brick'
 local screen_width = love.graphics.getWidth()
 local screen_height = love.graphics.getHeight()
 
-function Level:initialize()
+function Level:initialize(level_pattern)
   Level:constructWalls()
-  Level:constructBricks()
+  Level:constructBricks(level_pattern)
 end
 
 function Level.static:constructWalls()
@@ -25,22 +25,23 @@ function Level.static:constructWalls()
   }
 end
 
-function Level.static:constructBricks()
+function Level.static:constructBricks(level_pattern)
   local brick_index = ''
-  local rows, columns = 7, 11
   local top_left_position = {x = 70, y = 70}
   local width, height = 50, 30
   local gap = 10
   Entities.bricks = {}
-  for row = 1, rows do
-    for col = 1, columns do
-      brick_index = row..col
-      local position = {
-        x = top_left_position.x + width/2 + (col - 1) * (width + gap),
-        y = top_left_position.y + height/2 + (row - 1) * (height + gap)
-      }
-      local brick = Brick:new(brick_index, position, width, height)
-      Entities.bricks[brick_index] = brick
+  for row_index, row in ipairs(level_pattern) do
+    for col_index, brick_type in ipairs(row) do
+      brick_index = row_index..col_index
+      if brick_type ~= 0 then
+        local position = {
+          x = top_left_position.x + width/2 + (col_index - 1) * (width + gap),
+          y = top_left_position.y + height/2 + (row_index - 1) * (height + gap)
+        }
+        local brick = Brick:new(brick_index, position, width, height)
+        Entities.bricks[brick_index] = brick
+      end
     end
   end
 end

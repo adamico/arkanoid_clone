@@ -1,16 +1,21 @@
 Class = require 'lib.middleclass'
 Gamestate = require 'lib.hump.gamestate'
 Vector = require 'lib.hump.vector'
+local lume = require 'lib.lume'
 
-local menu = require 'states.menu'
-
+Levels = {}
 Entities = {}
+
+Menu = require 'states.menu'
+PreGame = require 'states.pre_game'
+Game = require 'states.game'
+GameOver = require 'states.game_over'
 
 love.graphics.setDefaultFilter('nearest', 'nearest')
 
 function love.load()
   Gamestate.registerEvents()
-  Gamestate.switch(menu)
+  Gamestate.switch(Menu)
   love.window.setTitle('My Arkanoid Clone')
   local meter = 64
   love.physics.setMeter(meter)
@@ -40,10 +45,11 @@ function beginContact(a, b, contact)
   local bData = b:getUserData()
   -- ball/bricks collisions
   if aData[1] == 'Ball' and bData[1] == 'Brick' then
-    Entities.bricks[bData[2]] = nil
+    Entities.bricks[bData[2]].physicalObject.body:destroy()
+    lume.remove(Entities.bricks, Entities.bricks[bData[2]])
   elseif bData[1] == 'Ball' and aData[1] == 'Brick' then
     Entities.bricks[aData[2]].physicalObject.body:destroy()
-    Entities.bricks[aData[2]] = nil
+    lume.remove(Entities.bricks, Entities.bricks[aData[2]])
   end
 end
 
@@ -84,4 +90,10 @@ function CenterText(string_array, color, vertical_offset)
   for i, text in pairs(text_array) do
     love.graphics.draw(text, love.graphics.getWidth()/2-width/2, vertical_offset-height/2+(i-1)*height)
   end
+end
+
+function TableLength(table)
+  local count = 0
+  for _ in pairs(table) do count = count + 1 end
+  return count
 end

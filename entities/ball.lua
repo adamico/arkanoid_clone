@@ -5,12 +5,13 @@ function Ball:initialize(state)
   self.radius = 10
   self.segments = 16
   self.color = {1, 1, 1}
+  self.initial_position = {x =  love.graphics.getWidth()/2, y = 500}
   self.physicalObject = self:buildPhysics(state)-- TODO: extract component
 end
 
 function Ball:buildPhysics(state)
   local object = {}
-  object.body = love.physics.newBody(World, love.graphics.getWidth()/2, 500, state)
+  object.body = love.physics.newBody(World, self.initial_position.x,  self.initial_position.y, state)
   object.body:setInertia(0)
   object.shape = love.physics.newCircleShape(self.radius)
   object.fixture = love.physics.newFixture(object.body, object.shape, 1)
@@ -23,6 +24,10 @@ end
 
 function Ball:setInMotion()
   self.physicalObject.body:setType('dynamic')
+end
+
+function Ball:reposition()
+  self.physicalObject.body:setPosition(self.initial_position.x, self.initial_position.y)
 end
 
 function Ball:draw()
