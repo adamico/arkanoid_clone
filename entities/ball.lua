@@ -1,27 +1,38 @@
-local ball = {
-  speed = {x = 300, y = 300},
-  radius = 10,
-  segments = 16
-}
+local Ball = Class('Ball')
 
-function ball.build()
+function Ball:initialize(state)
+  self.speed = {x = 300, y = 300}
+  self.radius = 10
+  self.segments = 16
+  self.color = {1, 1, 1}
+  self.physicalObject = self:buildPhysics(state)-- TODO: extract component
+end
+
+function Ball:buildPhysics(state)
   local object = {}
-  object.body = love.physics.newBody(World, love.graphics.getWidth()/2, 500, 'dynamic')
+  object.body = love.physics.newBody(World, love.graphics.getWidth()/2, 500, state)
   object.body:setInertia(0)
-  object.shape = love.physics.newCircleShape(ball.radius)
+  object.shape = love.physics.newCircleShape(self.radius)
   object.fixture = love.physics.newFixture(object.body, object.shape, 1)
-  -- object.point = love.physics.newCircleShape(ball.radius/4)
+  -- object.point = love.physics.newCircleShape(self.radius/4)
   -- object.fixture2 = love.physics.newFixture(object.body, object.point, 1)
   object.fixture:setRestitution(1)
-  object.fixture:setUserData({'Ball', 1})
-  Entities.ball = object
+  object.fixture:setUserData({'Ball', 1})--TODO: set object id in case of multiple balls in game
+  return object
 end
 
-function ball.draw()
-  local ball_object = Entities.ball
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.circle('line', ball_object.body:getX(), ball_object.body:getY(), ball_object.shape:getRadius(), ball.segments)
-  -- love.graphics.circle('line', ball_object.body:getX()+2, ball_object.body:getY()-2, ball_object.point:getRadius())
+function Ball:setInMotion()
+  self.physicalObject.body:setType('dynamic')
 end
 
-return ball
+function Ball:draw()
+  love.graphics.setColor(self.color)
+  love.graphics.circle('line',
+                       self.physicalObject.body:getX(),
+                       self.physicalObject.body:getY(),
+                       self.physicalObject.shape:getRadius(),
+                       self.segments)
+  -- love.graphics.circle('line', self.physicalObject.body:getX()+2, self.physicalObject.body:getY()-2, self.physicalObject.point:getRadius())
+end
+
+return Ball

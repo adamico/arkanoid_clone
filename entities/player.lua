@@ -1,31 +1,33 @@
-local player = {
-  speed = {x = 500, y = 3},
-  width = 70,
-  height = 20
-}
+local Player = Class('Player')
 
-function player.build()
+function Player:initialize()
+  self.speed = {x = 500, y = 3}
+  self.width = 70
+  self.height = 20
+  self.color = {1, 1, 1}
+  self.physicalObject = self:buildPhysics()-- TODO: extract component
+end
+
+function Player:buildPhysics()
   local object = {}
   object.body = love.physics.newBody(World, love.mouse.getX(), love.mouse.getY(), 'dynamic')
   object.body:setAngularDamping(0.1)
   object.body:setFixedRotation(true)
-  object.shape = love.physics.newRectangleShape(player.width, player.height)
+  object.shape = love.physics.newRectangleShape(self.width, self.height)
   object.fixture = love.physics.newFixture(object.body, object.shape, 2)
   object.fixture:setRestitution(1)
   object.fixture:setUserData({'Player', 1})
   object.joint = love.physics.newMouseJoint(object.body, love.mouse.getPosition())
-  Entities.player = object
-  
+  return object
 end
 
-function player.move(dt)
-  Entities.player.joint:setTarget(love.mouse.getPosition())
+function Player:move(dt)
+  self.physicalObject.joint:setTarget(love.mouse.getPosition())
 end
 
-function player.draw()
-  local player_object = Entities.player
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.polygon('line', player_object.body:getWorldPoints(player_object.shape:getPoints()))
+function Player:draw()
+  love.graphics.setColor(self.color)
+  love.graphics.polygon('line', self.physicalObject.body:getWorldPoints(self.physicalObject.shape:getPoints()))
 end
 
-return player
+return Player

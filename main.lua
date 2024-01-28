@@ -1,3 +1,4 @@
+Class = require 'lib.middleclass'
 Gamestate = require 'lib.hump.gamestate'
 Vector = require 'lib.hump.vector'
 
@@ -39,10 +40,10 @@ function beginContact(a, b, contact)
   local bData = b:getUserData()
   -- ball/bricks collisions
   if aData[1] == 'Ball' and bData[1] == 'Brick' then
-    Bricks[bData[2]] = nil
+    Entities.bricks[bData[2]] = nil
   elseif bData[1] == 'Ball' and aData[1] == 'Brick' then
-    Bricks[aData[2]].body:destroy()
-    Bricks[aData[2]] = nil
+    Entities.bricks[aData[2]].physicalObject.body:destroy()
+    Entities.bricks[aData[2]] = nil
   end
 end
 

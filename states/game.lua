@@ -1,19 +1,15 @@
 local game = {}
-local ball = require 'entities.ball'
-local bricks = require 'entities.bricks'
-local player = require 'entities.player'
-local walls = require 'entities.walls'
+local Level = require 'entities.level'
 
 function game:enter()
-  bricks.construct_level()
-  walls.construct()
+  Entities.level = Level:new()
   love.mouse.setVisible(false)
-  Entities.ball.body:setType('dynamic')
+  Entities.ball:setInMotion()
 end
 
 function game:update(dt)
   World:update(dt)
-  Entities.player.joint:setTarget(love.mouse.getPosition())
+  Entities.player.physicalObject.joint:setTarget(love.mouse.getPosition())
 end
 
 -- function game:mousemoved(x, y, dx, dy, istouch)
@@ -25,10 +21,10 @@ end
 -- end
 
 function game:draw()
-  ball.draw()
-  player.draw()
-  bricks.draw()
-  walls.draw()
+  Entities.level:draw()
+  Entities.ball:draw()
+  Entities.player:draw()
+
 end
 
 return game

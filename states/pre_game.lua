@@ -1,21 +1,19 @@
 local pre_game = {}
 local game = require 'states.game'
 
-local ball = require 'entities.ball'
-local player = require 'entities.player'
-
+local Ball = require 'entities.ball'
+local Player = require 'entities.player'
 local screen_width = love.graphics.getWidth()
 local screen_height = love.graphics.getHeight()
 
 function pre_game:enter()
-  ball.build()
-  Entities.ball.body:setType('static')
-  player.build()
+  Entities.ball = Ball:new('static')--TODO: change this to allow multiple balls in game
+  Entities.player = Player:new()
 end
 
 function pre_game:draw()
-  ball.draw()
-  player.draw()
+  Entities.ball:draw()
+  Entities.player:draw()
   local margin = 100
   love.graphics.setColor(0.8, 0.8, 0.8)
   love.graphics.rectangle('fill', margin, margin, screen_width-margin*2, screen_height/2 - margin)
@@ -24,7 +22,7 @@ end
 
 function pre_game:update(dt)
   World:update(dt)
-  player.move(dt)
+  Entities.player:move(dt)
 end
 
 function pre_game:mousereleased(x, y, button, istouch, presses)
