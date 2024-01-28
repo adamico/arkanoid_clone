@@ -3,9 +3,10 @@ Gamestate = require 'lib.hump.gamestate'
 Vector = require 'lib.hump.vector'
 local lume = require 'lib.lume'
 
-Levels = {}
 Entities = {}
 
+LevelLoader = require 'levels.loader'
+levelLoader = LevelLoader()
 Menu = require 'states.menu'
 PreGame = require 'states.pre_game'
 Game = require 'states.game'

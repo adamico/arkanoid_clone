@@ -1,36 +1,8 @@
 local game = {}
-local Level = require 'entities.level'
-
-Levels.sequence = {}
-Levels.sequence[1] = {
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1 },
-  { 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1 },
-  { 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0 },
-  { 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0 },
-  { 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-}
-
-Levels.sequence[2] = {
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-  { 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1 },
-  { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0 },
-  { 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0 },
-  { 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 },
-  { 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1 },
-  { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-}
-
-function game:init()
-  Levels.current_level = 1
-end
 
 function game:enter(current, current_level)
-  local current_level = current_level or Levels.current_level
-  Entities.level = Level:new(Levels.sequence[current_level])
+  local current_level = current_level or levelLoader.current_level
+  Entities.level = levelLoader:loadCurrentLevel()
   love.mouse.setVisible(false)
   Entities.ball:setInMotion()
 end
@@ -53,8 +25,9 @@ function game:keypressed(key)
 end
 
 function game:next_level()
-  if Levels.current_level < #Levels.sequence then
-    Levels.current_level = Levels.current_level + 1
+  local current_level = levelLoader.current_level
+  if  current_level < #levelLoader.sequence then
+    levelLoader.current_level = current_level + 1
     Entities.ball:reposition()
     Entities.bricks = {}
     Gamestate.switch(game)

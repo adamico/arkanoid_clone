@@ -5,7 +5,7 @@ function game_over:enter()
   Entities.ball = {}
   Entities.player.physicalObject.body:destroy()
   Entities.player = {}
-  Levels.current_level = 1
+  levelLoader.current_level = 1
 end
 
 function game_over:draw()
